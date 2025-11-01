@@ -1,264 +1,124 @@
-// Весь код для фронтенда написан Qwen3-Max
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>sptodo</title>
-  <style>
-    /* Стили в стиле Apple: чистота, воздух, типографика */
-    :root {
-      --bg: #ffffff;
-      --text: #1d1d1f;
-      --text-secondary: #86868b;
-      --border: #e0e0e0;
-      --accent: #0071e3;
-      --success: #30d158;
-      --danger: #ff3b30;
-      --radius: 12px;
-      --shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-      padding: 40px 20px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      font-weight: 600;
-      font-size: 32px;
-      text-align: center;
-      margin-bottom: 32px;
-      background: linear-gradient(135deg, #0071e3, #30d158);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .input-group {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
-    }
-
-    button {
-      padding: 14px 20px;
-      border: none;
-      border-radius: var(--radius);
-      font-weight: 500;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      outline: none;
-    }
-
-    .add-btn {
-      background: linear-gradient(135deg, #0071e3, #30d158);
-      color: white;
-    }
-
-    .add-btn:hover {
-      background: linear-gradient(135deg, #0071e3, #30d158);
-    }
-
-    .task {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      padding: 16px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 12px;
-      background: white;
-      box-shadow: var(--shadow);
-    }
-
-    .task.completed {
-      opacity: 0.7;
-    }
-
-    .task-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .task-title {
-      font-size: 17px;
-      margin-bottom: 6px;
-      word-break: break-word;
-    }
-
-    .task.completed .task-title {
-      text-decoration: line-through;
-      color: var(--text-secondary);
-    }
-
-    .task-meta {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .task-actions {
-      display: flex;
-      gap: 8px;
-      margin-left: 16px;
-    }
-
-    .complete-btn {
-      background: var(--success);
-      color: white;
-      padding: 8px 12px;
-      font-size: 14px;
-    }
-
-    .complete-btn:hover {
-      background: #29b54d;
-    }
-
-    .delete-btn {
-      background: var(--danger);
-      color: white;
-      padding: 8px 12px;
-      font-size: 14px;
-    }
-
-    .delete-btn:hover {
-      background: #e52d24;
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--text-secondary);
-      font-style: italic;
-      padding: 40px 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>on the edge of infinity</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>✨ sptodo</h1>
+    <div class="app-container">
+        <!-- Auth Section -->
+        <div id="auth-section" class="auth-section active">
+            <div class="auth-container">
+                <h1 class="app-title">on the edge of<br><span class="infinity">infinity</span></h1>
+                
+                <div class="auth-forms">
+                    <div class="form-container active" id="login-form">
+                        <h2>Вход</h2>
+                        <form id="loginForm">
+                            <input type="text" id="loginUsername" placeholder="Логин" required>
+                            <input type="password" id="loginPassword" placeholder="Пароль" required>
+                            <button type="submit">Войти</button>
+                        </form>
+                        <p class="switch-form">Нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a></p>
+                    </div>
 
-  <div class="input-group">
-    <input type="text" id="title" placeholder="Что нужно сделать?" autocomplete="off" />
-    <button class="add-btn" onclick="addTodo()">Добавить</button>
-  </div>
+                    <div class="form-container" id="register-form">
+                        <h2>Регистрация</h2>
+                        <form id="registerForm">
+                            <input type="text" id="registerUsername" placeholder="Логин" required>
+                            <input type="password" id="registerPassword" placeholder="Пароль" required>
+                            <button type="submit">Создать аккаунт</button>
+                        </form>
+                        <p class="switch-form">Есть аккаунт? <a href="#" id="showLogin">Войти</a></p>
+                    </div>
+                </div>
 
-  <div id="tasks"></div>
-
-  <script>
-    async function loadTodos() {
-      try {
-        const res = await fetch('/api/todos');
-        const todos = await res.json();
-        const container = document.getElementById('tasks');
-        
-        if (todos.length === 0) {
-          container.innerHTML = '<div class="empty">Нет задач. Отличный повод начать!</div>';
-          return;
-        }
-
-        container.innerHTML = '';
-        todos.forEach((todo, index) => {
-          const isCompleted = todo.completed;
-          const createdAt = new Date(todo.created_at).toLocaleString('ru-RU', {
-            day: '2-digit',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-          const completedAt = todo.completed_at 
-            ? ` • Выполнено: ${new Date(todo.completed_at).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`
-            : '';
-
-          const taskEl = document.createElement('div');
-          taskEl.className = `task ${isCompleted ? 'completed' : ''}`;
-          taskEl.innerHTML = `
-            <div class="task-content">
-              <div class="task-title">${todo.title}</div>
-              <div class="task-meta">Создано: ${createdAt}${completedAt}</div>
+                <div class="brand-lines">
+                    <div class="brand-line">sukoya.deejgn</div>
+                    <div class="brand-line">zazyskyk.matimir</div>
+                    <div class="brand-line">web-produci-brand</div>
+                </div>
             </div>
-            <div class="task-actions">
-              ${!isCompleted ? `<button class="complete-btn" onclick="completeTodo(${index})">✓</button>` : ''}
-              <button class="delete-btn" onclick="deleteTodo(${index})">🗑️</button>
+        </div>
+
+        <!-- Todo Section -->
+        <div id="todo-section" class="todo-section">
+            <header class="header">
+                <div class="header-content">
+                    <h1>on the edge of <span class="infinity">infinity</span></h1>
+                    <div class="user-menu">
+                        <span id="usernameDisplay"></span>
+                        <button id="settingsBtn" class="settings-btn">⚙️</button>
+                        <button id="logoutBtn" class="logout-btn">Выйти</button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="main-content">
+                <div class="add-todo">
+                    <form id="addTodoForm">
+                        <input type="text" id="newTodoInput" placeholder="Что нужно сделать?" required>
+                        <button type="submit">+</button>
+                    </form>
+                </div>
+
+                <div class="todos-container">
+                    <div id="todosList" class="todos-list">
+                        <!-- Todos will be loaded here -->
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <div class="brand-lines">
+                    <div class="brand-line">sukoya.deejgn</div>
+                    <div class="brand-line">zazyskyk.matimir</div>
+                    <div class="brand-line">web-produci-brand</div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Настройки аккаунта</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="danger-zone">
+                        <h3>Опасная зона</h3>
+                        <p>Удаление аккаунта невозможно отменить. Все ваши данные будут безвозвратно удалены.</p>
+                        <button id="deleteAccountBtn" class="delete-account-btn">Удалить аккаунт</button>
+                    </div>
+                </div>
             </div>
-          `;
-          container.appendChild(taskEl);
-        });
-      } catch (err) {
-        console.error('Ошибка загрузки:', err);
-      }
-    }
+        </div>
 
-    async function addTodo() {
-      const input = document.getElementById('title');
-      const title = input.value.trim();
-      if (!title) return;
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteConfirmModal" class="modal">
+            <div class="modal-content confirm-modal">
+                <div class="modal-header">
+                    <h2>Подтверждение удаления</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.</p>
+                    <div class="confirm-buttons">
+                        <button id="confirmDeleteBtn" class="confirm-delete-btn">Да, удалить аккаунт</button>
+                        <button id="cancelDeleteBtn" class="cancel-delete-btn">Отмена</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-      try {
-        await fetch('/api/todos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title })
-        });
-        input.value = '';
-        input.focus();
-        loadTodos();
-      } catch (err) {
-        alert('Не удалось добавить задачу');
-      }
-    }
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
 
-    async function completeTodo(index) {
-      try {
-        await fetch(`/api/todos/${index}/complete`, { method: 'PUT' });
-        loadTodos();
-      } catch (err) {
-        alert('Не удалось завершить задачу');
-      }
-    }
-
-    async function deleteTodo(index) {
-      if (!confirm('Уверены, что хотите удалить эту задачу?')) return;
-      try {
-        await fetch(`/api/todos/${index}`, { method: 'DELETE' });
-        loadTodos();
-      } catch (err) {
-        alert('Не удалось удалить задачу');
-      }
-    }
-
-    // Поддержка Enter в поле ввода
-    document.getElementById('title').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') addTodo();
-    });
-
-    // Загрузка при старте
-    loadTodos();
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>

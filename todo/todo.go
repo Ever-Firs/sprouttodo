@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 )
+
+const dataDir = "data"
 
 // Моя одна задача
 type Todo struct {
@@ -85,8 +88,14 @@ func (todos Todos) Filter(complete_filter *bool) Todos {
 	return result
 }
 
-func (todos Todos) Save(filename string) error {
-	file, err := os.Create(filename)
+func (todos Todos) Save(login string) error {
+	dir := filepath.Join(dataDir, login)
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return err
+	}
+
+	path := filepath.Join(dir, "todos.json")
+	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}
@@ -96,22 +105,18 @@ func (todos Todos) Save(filename string) error {
 	return encoder.Encode(todos)
 }
 
-func (todos *Todos) Load(filename string) error {
-	file, err := os.Open(filename)
+func (todos *Todos) Load(login string) error {
+	path := filepath.Join(dataDir, login, "todos.json")
+	file, err := os.Open(path)
 	if err != nil {
 		if os.IsNotExist(err) {
+			*todos = Todos{} // пустой список
 			return nil
 		}
 		return err
 	}
 
 	defer file.Close()
-	var loaded Todos
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&loaded); err != nil {
-		return err
-	}
 
-	*todos = loaded
-	return nil
+	return json.NewDecoder(file).Decode(todos)
 }
