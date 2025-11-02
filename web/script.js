@@ -39,16 +39,25 @@ class TaskFlowApp {
                 e.target.classList.add('active');
             }
         });
+
+        // Закрытие мобильного меню при клике на контент
+        document.querySelector('.main-content').addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                this.hideMobileMenu();
+            }
+        });
     }
 
     showAuthScreen() {
         document.getElementById('authScreen').classList.add('active');
         document.getElementById('mainScreen').classList.remove('active');
+        document.querySelector('.mobile-header').style.display = 'none';
     }
 
     showMainScreen() {
         document.getElementById('authScreen').classList.remove('active');
         document.getElementById('mainScreen').classList.add('active');
+        document.querySelector('.mobile-header').style.display = 'flex';
     }
 
     showSection(sectionName) {
@@ -56,6 +65,11 @@ class TaskFlowApp {
             section.classList.remove('active');
         });
         document.getElementById(sectionName + 'Section').classList.add('active');
+        
+        // Закрываем мобильное меню после выбора раздела
+        if (window.innerWidth <= 768) {
+            this.hideMobileMenu();
+        }
     }
 
     showModal(modalId) {
@@ -67,6 +81,16 @@ class TaskFlowApp {
             modal.classList.remove('active');
         });
         this.currentEditingNote = null;
+    }
+
+    toggleMobileMenu() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('mobile-open');
+    }
+
+    hideMobileMenu() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.remove('mobile-open');
     }
 
     // Авторизация
@@ -89,6 +113,7 @@ class TaskFlowApp {
             if (response.ok) {
                 this.currentUser = username;
                 document.getElementById('usernameDisplay').textContent = username;
+                document.getElementById('mobileUsername').textContent = username;
                 this.showMainScreen();
                 this.loadTodos();
                 this.loadNotes();
@@ -464,6 +489,10 @@ function showViewNoteModal() {
     app.showViewNoteModal();
 }
 
+function toggleMobileMenu() {
+    app.toggleMobileMenu();
+}
+
 // Инициализация приложения
 const app = new TaskFlowApp();
 
@@ -485,3 +514,4 @@ window.deleteAccount = deleteAccount;
 window.enableNoteEdit = enableNoteEdit;
 window.saveNoteEdit = saveNoteEdit;
 window.showViewNoteModal = showViewNoteModal;
+window.toggleMobileMenu = toggleMobileMenu;
