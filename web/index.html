@@ -1,121 +1,207 @@
+<!-- web/index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>on the edge of infinity</title>
+    <title>TaskFlow</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Auth Section -->
-        <div id="auth-section" class="auth-section active">
-            <div class="auth-container">
-                <h1 class="app-title">on the edge of<br><span class="infinity">infinity</span></h1>
-                
-                <div class="auth-forms">
-                    <div class="form-container active" id="login-form">
-                        <h2>Вход</h2>
-                        <form id="loginForm">
-                            <input type="text" id="loginUsername" placeholder="Логин" required>
-                            <input type="password" id="loginPassword" placeholder="Пароль" required>
-                            <button type="submit">Войти</button>
-                        </form>
-                        <p class="switch-form">Нет аккаунта? <a href="#" id="showRegister">Зарегистрироваться</a></p>
-                    </div>
+    <div class="background-effects">
+        <div class="blur-circle-1"></div>
+        <div class="blur-circle-2"></div>
+        <div class="blur-circle-3"></div>
+    </div>
 
-                    <div class="form-container" id="register-form">
-                        <h2>Регистрация</h2>
-                        <form id="registerForm">
-                            <input type="text" id="registerUsername" placeholder="Логин" required>
-                            <input type="password" id="registerPassword" placeholder="Пароль" required>
-                            <button type="submit">Создать аккаунт</button>
-                        </form>
-                        <p class="switch-form">Есть аккаунт? <a href="#" id="showLogin">Войти</a></p>
+    <!-- Экран авторизации -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <div class="app-logo">
+                <h1>TaskFlow</h1>
+                <p>Organize your work and life</p>
+            </div>
+            
+            <div class="auth-forms">
+                <!-- Форма входа -->
+                <div id="loginForm" class="auth-form active">
+                    <h2>Welcome Back</h2>
+                    <p class="auth-subtitle">We missed you!</p>
+                    
+                    <div class="input-group">
+                        <input type="text" placeholder="Username" id="loginUsername">
                     </div>
+                    <div class="input-group">
+                        <input type="password" placeholder="Password" id="loginPassword">
+                    </div>
+                    
+                    <button class="auth-btn" onclick="handleLogin()">Sign In</button>
+                    
+                    <p class="auth-switch">
+                        Don't have an account? 
+                        <a href="#" onclick="showRegisterForm()">Sign Up</a>
+                    </p>
                 </div>
 
-                <div class="brand-lines">
-                    <div class="brand-line">sukoya.deejgn</div>
-                    <div class="brand-line">zazyskyk.matimir</div>
-                    <div class="brand-line">web-produci-brand</div>
+                <!-- Форма регистрации -->
+                <div id="registerForm" class="auth-form">
+                    <h2>Create Account</h2>
+                    <p class="auth-subtitle">Join us today</p>
+                    
+                    <div class="input-group">
+                        <input type="text" placeholder="Username" id="registerUsername">
+                    </div>
+                    <div class="input-group">
+                        <input type="password" placeholder="Password" id="registerPassword">
+                    </div>
+                    
+                    <button class="auth-btn" onclick="handleRegister()">Create Account</button>
+                    
+                    <p class="auth-switch">
+                        Already have an account? 
+                        <a href="#" onclick="showLoginForm()">Sign In</a>
+                    </p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Todo Section -->
-        <div id="todo-section" class="todo-section">
-            <header class="header">
-                <div class="header-content">
-                    <h1>on the edge of <span class="infinity">infinity</span></h1>
-                    <div class="user-menu">
-                        <span id="usernameDisplay"></span>
-                        <button id="settingsBtn" class="settings-btn">⚙️</button>
-                        <button id="logoutBtn" class="logout-btn">Выйти</button>
-                    </div>
+    <!-- Главный экран -->
+    <div id="mainScreen" class="screen">
+        <!-- Боковая панель -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>TaskFlow</h2>
+                <div class="user-welcome">
+                    <p>Hi <span id="usernameDisplay">User</span>!</p>
+                    <p class="welcome-text">Welcome back to the workspace</p>
                 </div>
-            </header>
+            </div>
 
-            <main class="main-content">
-                <div class="add-todo">
-                    <form id="addTodoForm">
-                        <input type="text" id="newTodoInput" placeholder="Что нужно сделать?" required>
-                        <button type="submit">+</button>
-                    </form>
-                </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" onclick="showSection('tasks')">
+                    <span>📝</span>
+                    Tasks
+                </button>
+                <button class="nav-item" onclick="showSection('notes')">
+                    <span>📒</span>
+                    Notes
+                </button>
+            </nav>
 
-                <div class="todos-container">
-                    <div id="todosList" class="todos-list">
-                        <!-- Todos will be loaded here -->
-                    </div>
-                </div>
-            </main>
-
-            <footer class="footer">
-                <div class="brand-lines">
-                    <div class="brand-line">sukoya.deejgn</div>
-                    <div class="brand-line">zazyskyk.matimir</div>
-                    <div class="brand-line">web-produci-brand</div>
-                </div>
-            </footer>
-        </div>
-
-        <!-- Settings Modal -->
-        <div id="settingsModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Настройки аккаунта</h2>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="danger-zone">
-                        <h3>Опасная зона</h3>
-                        <p>Удаление аккаунта невозможно отменить. Все ваши данные будут безвозвратно удалены.</p>
-                        <button id="deleteAccountBtn" class="delete-account-btn">Удалить аккаунт</button>
-                    </div>
-                </div>
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+                <button class="delete-account-btn" onclick="showDeleteAccountModal()">🗑️ Delete Account</button>
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
-        <div id="deleteConfirmModal" class="modal">
-            <div class="modal-content confirm-modal">
-                <div class="modal-header">
-                    <h2>Подтверждение удаления</h2>
+        <!-- Основной контент -->
+        <div class="main-content">
+            <!-- Секция задач -->
+            <div id="tasksSection" class="content-section active">
+                <div class="content-header">
+                    <h1>Today's Tasks</h1>
+                    <button class="add-btn" onclick="showAddTaskModal()">+ New Task</button>
                 </div>
-                <div class="modal-body">
-                    <p>Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.</p>
-                    <div class="confirm-buttons">
-                        <button id="confirmDeleteBtn" class="confirm-delete-btn">Да, удалить аккаунт</button>
-                        <button id="cancelDeleteBtn" class="cancel-delete-btn">Отмена</button>
+
+                <div class="tasks-container">
+                    <div class="task-column">
+                        <h3>To Do</h3>
+                        <div id="todoList" class="task-list">
+                            <!-- Задачи будут здесь -->
+                        </div>
+                    </div>
+                    
+                    <div class="task-column">
+                        <h3>Completed</h3>
+                        <div id="completedList" class="task-list">
+                            <!-- Выполненные задачи здесь -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Loading Overlay -->
-        <div id="loadingOverlay" class="loading-overlay">
-            <div class="loading-spinner"></div>
+            <!-- Секция заметок -->
+            <div id="notesSection" class="content-section">
+                <div class="content-header">
+                    <h1>My Notes</h1>
+                    <button class="add-btn" onclick="showAddNoteModal()">+ New Note</button>
+                </div>
+
+                <div id="notesGrid" class="notes-grid">
+                    <!-- Заметки будут здесь -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <h3>Create New Task</h3>
+            <input type="text" id="taskTitleInput" placeholder="Task title...">
+            <div class="modal-actions">
+                <button class="primary-btn" onclick="addTask()">Create Task</button>
+                <button class="secondary-btn" onclick="hideModals()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addNoteModal" class="modal">
+        <div class="modal-content">
+            <h3>Create New Note</h3>
+            <input type="text" id="noteTitleInput" placeholder="Note title...">
+            <textarea id="noteContentInput" placeholder="Note content..."></textarea>
+            <div class="modal-actions">
+                <button class="primary-btn" onclick="addNote()">Create Note</button>
+                <button class="secondary-btn" onclick="hideModals()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewNoteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="viewNoteTitle">Note Title</h3>
+                <button class="close-btn" onclick="hideModals()">×</button>
+            </div>
+            <div class="note-meta">
+                <span>Created: <span id="viewNoteCreatedAt"></span></span>
+                <span>Updated: <span id="viewNoteUpdatedAt"></span></span>
+            </div>
+            <div class="note-content-full" id="viewNoteContent">
+                <!-- Полное содержимое заметки -->
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-btn" onclick="enableNoteEdit()">✏️ Edit</button>
+                <button class="primary-btn" onclick="hideModals()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editNoteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Note</h3>
+                <button class="close-btn" onclick="hideModals()">×</button>
+            </div>
+            <input type="text" id="editNoteTitle" placeholder="Note title...">
+            <textarea id="editNoteContent" placeholder="Note content..."></textarea>
+            <div class="modal-actions">
+                <button class="primary-btn" onclick="saveNoteEdit()">Save Changes</button>
+                <button class="secondary-btn" onclick="showViewNoteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteAccountModal" class="modal">
+        <div class="modal-content">
+            <h3>Delete Account</h3>
+            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="danger-btn" onclick="deleteAccount()">Delete Account</button>
+                <button class="secondary-btn" onclick="hideModals()">Cancel</button>
+            </div>
         </div>
     </div>
 

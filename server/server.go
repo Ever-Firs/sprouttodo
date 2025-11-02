@@ -6,12 +6,24 @@ import (
 	"net/http"
 	"os"
 	"sptodo/auth"
+	"sptodo/note"
 	"sptodo/todo"
 	"strconv"
+	"time"
 )
 
 type AddTodoRequest struct {
 	Title string `json:"title"`
+}
+
+type AddNoteRequest struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
+type UpdateNoteRequest struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }
 
 var authSystem *auth.Auth // ← глобальная переменная
@@ -35,6 +47,13 @@ func Start() error {
 	mux.HandleFunc("POST /api/todos", requireAuth(addTodo))
 	mux.HandleFunc("PUT /api/todos/{id}/complete", requireAuth(completeTodo))
 	mux.HandleFunc("DELETE /api/todos/{id}", requireAuth(deleteTodo))
+
+	//Заметки
+	mux.HandleFunc("GET /api/notes", requireAuth(getNotes))
+	mux.HandleFunc("GET /api/notes/{id}", requireAuth(getNote))
+	mux.HandleFunc("POST /api/notes", requireAuth(addNote))
+	mux.HandleFunc("PUT /api/notes/{id}", requireAuth(updateNote))
+	mux.HandleFunc("DELETE /api/notes/{id}", requireAuth(deleteNote))
 
 	// Статика
 	mux.Handle("/", http.FileServer(http.Dir("./web/")))
@@ -244,4 +263,161 @@ func completeTodo(w http.ResponseWriter, r *http.Request) {
 	// 6. Отвечаем 204
 	w.WriteHeader(http.StatusNoContent)
 
+}
+
+func getNotes(w http.ResponseWriter, r *http.Request) {
+	login := r.Context().Value("user").(string)
+
+	var notes note.Notes
+	if err := notes.Load(login); err != nil {
+		http.Error(w, "Ошибка загрузки заметок", http.StatusInternalServerError)
+		return
+	}
+
+	// Оптимизация: не отправляем content в списке
+	type NotePreview struct {
+		ID        int       `json:"id"`
+		Title     string    `json:"title"`
+		CreatedAt time.Time `json:"created_at"`
+		UpdatedAt time.Time `json:"updated_at"`
+	} //Вынести в note пакет
+
+	previews := make([]NotePreview, len(notes))
+	for i, n := range notes {
+		previews[i] = NotePreview{
+			ID:        n.ID,
+			Title:     n.Title,
+			CreatedAt: n.CreatedAt,
+			UpdatedAt: n.UpdatedAt,
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(previews)
+}
+
+func getNote(w http.ResponseWriter, r *http.Request) {
+	login := r.Context().Value("user").(string)
+	idStr := r.PathValue("id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Неверный ID", http.StatusBadRequest)
+		return
+	}
+
+	var notes note.Notes
+	if err := notes.Load(login); err != nil {
+		http.Error(w, "Ошибка загрузки", http.StatusInternalServerError)
+		return
+	}
+
+	for _, n := range notes {
+		if n.ID == id {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(n)
+			return
+		}
+	}
+
+	http.Error(w, "Заметка не найдена", http.StatusNotFound)
+}
+
+func addNote(w http.ResponseWriter, r *http.Request) {
+	login := r.Context().Value("user").(string)
+
+	var req AddNoteRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Неверный JSON", http.StatusBadRequest)
+		return
+	}
+
+	if req.Title == "" {
+		http.Error(w, "Заголовок обязателен", http.StatusBadRequest)
+		return
+	}
+
+	var notes note.Notes
+	if err := notes.Load(login); err != nil {
+		http.Error(w, "Ошибка загрузки", http.StatusInternalServerError)
+		return
+	}
+
+	notes.Add(req.Title, req.Content)
+
+	if err := notes.Save(login); err != nil {
+		http.Error(w, "Ошибка сохранения", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+}
+
+func updateNote(w http.ResponseWriter, r *http.Request) {
+	login := r.Context().Value("user").(string)
+	idStr := r.PathValue("id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Неверный ID", http.StatusBadRequest)
+		return
+	}
+
+	var req UpdateNoteRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Неверный JSON", http.StatusBadRequest)
+		return
+	}
+
+	if req.Title == "" {
+		http.Error(w, "Заголовок обязателен", http.StatusBadRequest)
+		return
+	}
+
+	var notes note.Notes
+	if err := notes.Load(login); err != nil {
+		http.Error(w, "Ошибка загрузки", http.StatusInternalServerError)
+		return
+	}
+
+	if err := notes.Update(id, req.Title, req.Content); err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	if err := notes.Save(login); err != nil {
+		http.Error(w, "Ошибка сохранения", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func deleteNote(w http.ResponseWriter, r *http.Request) {
+	login := r.Context().Value("user").(string)
+	idStr := r.PathValue("id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Неверный ID", http.StatusBadRequest)
+		return
+	}
+
+	var notes note.Notes
+	if err := notes.Load(login); err != nil {
+		http.Error(w, "Ошибка загрузки", http.StatusInternalServerError)
+		return
+	}
+
+	if err := notes.Delete(id); err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	if err := notes.Save(login); err != nil {
+		http.Error(w, "Ошибка сохранения", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
